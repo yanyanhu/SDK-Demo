@@ -1,9 +1,10 @@
 {
    "chainName":"hello-world",
-   "deployWaitTime":"60",
+   "deployWaitTime":"300",
+   "invokeWaitTime": "60",
    "user": {
 	"username": "JohnDoe",
-        "affiliation" : "group1"
+        "affiliation" : "bank_a"
    },
    "deployRequest":{
       "chaincodePath":"chaincode",

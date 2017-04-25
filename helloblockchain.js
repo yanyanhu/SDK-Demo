@@ -39,10 +39,11 @@ function init() {
 
     // Read and process the credentials.json
     try {
-        network = JSON.parse(fs.readFileSync(__dirname + '/ServiceCredentials.json', 'utf8'));
+        network = JSON.parse(fs.readFileSync(__dirname + '/ServiceCredentialsLocal.json', 'utf8'));
         if (network.credentials) network = network.credentials;
     } catch (err) {
-        console.log("ServiceCredentials.json is missing or invalid file, Rerun the program with right file")
+		console.log(err);
+        console.log("ServiceCredentialsLocal.json is missing or invalid file, Rerun the program with right file")
         process.exit();
     }
 
@@ -60,7 +61,10 @@ function init() {
         chain.getUser(newUserName, function(err, user) {
             if (err) throw Error(" Failed to register and enroll " + deployerName + ": " + err);
             userObj = user;
+	    console.log("Starting...")
             invoke();
+	    //query();
+	    console.log("Done")
         });
     } else {
         enrollAndRegisterUsers();
@@ -72,7 +76,7 @@ function setup() {
     // of the discovery host name.  The HSBN will contain the string zone.
     var isHSBN = peers[0].discovery_host.indexOf('secure') >= 0 ? true : false;
     var network_id = Object.keys(network.ca);
-    caUrl = "grpcs://" + network.ca[network_id].discovery_host + ":" + network.ca[network_id].discovery_port;
+    caUrl = "grpc://" + network.ca[network_id].discovery_host + ":" + network.ca[network_id].discovery_port;
 
     // Configure the KeyValStore which is used to store sensitive keys.
     // This data needs to be located or accessible any time the users enrollmentID
@@ -96,12 +100,12 @@ function setup() {
     // Adding all the peers to blockchain
     // this adds high availability for the client
     for (var i = 0; i < peers.length; i++) {
-        // Peers on Bluemix require secured connections, hence 'grpcs://'
-        peerUrls.push("grpcs://" + peers[i].discovery_host + ":" + peers[i].discovery_port);
+        // Peers on Bluemix require secured connections, hence 'grpc://'
+        peerUrls.push("grpc://" + peers[i].discovery_host + ":" + peers[i].discovery_port);
         chain.addPeer(peerUrls[i], {
             pem: cert
         });
-        eventUrls.push("grpcs://" + peers[i].event_host + ":" + peers[i].event_port);
+        eventUrls.push("grpc://" + peers[i].event_host + ":" + peers[i].event_port);
         chain.eventHubConnect(eventUrls[0], {
             pem: cert
         });
